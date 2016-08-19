@@ -44,6 +44,7 @@ def generate_pdf_template_object(template_object, file_object, context, link_cal
     Inner function to pass template objects directly instead of passing a filename
     """
     html = template_object.render(Context(context))
+    # Here is where the PDF is created. See pisa module.
     pisa.CreatePDF(html.encode("UTF-8"), file_object , encoding='UTF-8',
                    link_callback=link_callback)
     return file_object
@@ -65,11 +66,13 @@ def generate_pdf(template_name, file_object=None, context=None, link_callback=fe
         file_object = StringIO.StringIO()
     if not context:
         context = {}
+    # Renders the file and context to the template and returns the HTTPResponse
     tmpl = get_template(template_name)
     generate_pdf_template_object(tmpl, file_object, context, link_callback=link_callback)
     return file_object
 
 def render_to_pdf_response(template_name, context=None, pdfname=None, link_callback=fetch_resources):
+    """Returns HTTPResponse object with the pdf file name."""
     file_object = HttpResponse(content_type='application/pdf')
     if not pdfname:
         pdfname = '%s.pdf' % os.path.splitext(os.path.basename(template_name))[0]
